@@ -1,32 +1,26 @@
 const express = require("express");
+const employeesRouter = require("./routes/employees");
+const notFound = require("./middleware/notFound");
+const errorHandler = require("./middleware/errorHandler");
+
 const app = express();
 const PORT = 3000;
 
+// Root route
 app.get("/", (req, res) => {
   res.send("Hello employees!");
 });
 
-const employees = require("./employees");
+// Employees routes
+app.use("/employees", employeesRouter);
 
-app.get("/employees", (req, res) => {
-  res.json(employees);
-});
+// 404 Middleware
+app.use(notFound);
 
-app.get("/employees/random", (req, res) => {
-  const i = Math.floor(Math.random() * employees.length);
-  res.json(employees[i]);
-});
+// Error-handling middleware
+app.use(errorHandler);
 
-app.get("/employees/:id", (req, res) => {
-  const { id } = req.params;
-  const employee = employees.find((e) => e.id === +id);
-  if (employee) {
-    res.json(employee);
-  } else {
-    res.status(404).send(`There is no employee with id ${id}.`);
-  }
-});
-
+// Start server
 app.listen(PORT, () => {
-  `Listening on port ${PORT}...`;
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
